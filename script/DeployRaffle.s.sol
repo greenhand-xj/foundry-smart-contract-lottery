@@ -18,11 +18,11 @@ contract DeployRaffle is Script {
             config.entranceFee,
             config.gasLane,
             config.subscriptionId,
-            config.callbackGasLimit
-            config.vrfCoordinator,
+            config.callbackGasLimit,
+            config.vrfCoordinator
         );
         vm.stopBroadcast();
-        
+
         return (raffle, helperConfig);
     }
 }

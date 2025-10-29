@@ -65,7 +65,7 @@ contract HelperConfig is Script, CodeConstants {
             return localNetworkConfig;
         }
 
-        VRFCoordinatorV2_5Mock vrfCoordinatorMock = new VRFCoordinatorV2_5Mock(MOCK_BASE_FEE, MOCK_GAS_PRICE_LINK);
+        VRFCoordinatorV2_5Mock vrfCoordinatorMock = new VRFCoordinatorV2_5Mock(MOCK_BASE_FEE, MOCK_GAS_PRICE_LINK,MOCK_WEI_PER_UINT_LINK);
         localNetworkConfig = NetworkConfig({
             entranceFee: 0.01 ether,
             vrfCoordinator: address(vrfCoordinatorMock),
