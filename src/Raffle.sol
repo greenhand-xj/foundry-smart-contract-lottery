@@ -38,7 +38,7 @@ contract Raffle is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
     error Raffle__SendMoreToEnterRaffle();
     error Raffle__RaffleNotOpen();
     error Raffle__TransferFailed();
-     error Raffle__UpkeepNotNeeded(uint256 currentBalance, uint256 numPlayers, uint256 raffleState);
+    error Raffle__UpkeepNotNeeded(uint256 currentBalance, uint256 numPlayers, uint256 raffleState);
 
     /* Type declarations */
     enum RaffleState {
@@ -77,6 +77,7 @@ contract Raffle is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
     ) VRFConsumerBaseV2Plus(vrfCoordinator) {
         i_subscriptionId = subscriptionId;
         i_interval = interval;
+        i_entranceFee = entranceFee;
         s_lastTimeStamp = block.timestamp;
         i_keyHash = gasLane;
         i_callbackGasLimit = callbackGasLimit;
@@ -133,7 +134,7 @@ contract Raffle is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
     function performUpkeep(
         bytes calldata /* performData */
     )
-        external    
+        external
         override
     {
         (bool upkeepNeeded,) = checkUpkeep("");
@@ -191,5 +192,9 @@ contract Raffle is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
 
     function getEntranceFee() public view returns (uint256) {
         return i_entranceFee;
+    }
+
+    function getRaffleState() public view returns (RaffleState) {
+        return s_raffleState;
     }
 }
