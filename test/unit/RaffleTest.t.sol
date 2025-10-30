@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import {Test,console} from "forge-std/Test.sol";
+import {Test, console} from "forge-std/Test.sol";
 import {Raffle} from "src/Raffle.sol";
 import {DeployRaffle} from "script/DeployRaffle.s.sol";
 import {HelperConfig} from "script/HelperConfig.s.sol";
@@ -21,6 +21,9 @@ contract RaffleTest is Test {
     uint32 callbackGasLimit;
     address vrfCoordinator;
 
+    /* Events */
+    event RaffleEnter(address indexed player);
+
     function setUp() public {
         DeployRaffle deployer = new DeployRaffle();
         (raffle, helperConfig) = deployer.deployContract();
@@ -33,7 +36,7 @@ contract RaffleTest is Test {
         entranceFee = config.entranceFee;
         callbackGasLimit = config.callbackGasLimit;
         vrfCoordinator = config.vrfCoordinator;
-        console.log("Deploying Raffle...",entranceFee);
+        console.log("Deploying Raffle...", entranceFee);
     }
 
     function testRaffleInitializesInOpenState() public view {
@@ -46,8 +49,23 @@ contract RaffleTest is Test {
     function testRaffleRevertsWHenYouDontPayEnough() public {
         vm.prank(PLAYER);
         vm.expectRevert(Raffle.Raffle__SendMoreToEnterRaffle.selector);
-        
+
         raffle.enterRaffle();
     }
 
+    function testRaffleRecordsPlayersWhenTheyEnter() public {
+        vm.prank(PLAYER);
+        raffle.enterRaffle{value: entranceFee}();
+
+        address playerRecorded = raffle.getPlayer(0);
+        assert(playerRecorded == PLAYER);
+    }
+
+    function testEnteringRaffleEmitsEvent() public {
+        vm.prank(PLAYER);
+        vm.expectEmit(true, false, false, false, address(raffle));
+
+        emit RaffleEnter(PLAYER);
+        raffle.enterRaffle{value: entranceFee}();
+    }
 }
