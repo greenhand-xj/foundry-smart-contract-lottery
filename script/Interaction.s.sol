@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MTI
 pragma solidity ^0.8.19;
 
-import {Script, console} from "forge-std/Script.sol";
+import {Script, console,console2} from "forge-std/Script.sol";
 import {VRFCoordinatorV2_5Mock} from "@chainlink/contracts/src/v0.8/vrf/mocks/VRFCoordinatorV2_5Mock.sol";
 import {HelperConfig, CodeConstants} from "./HelperConfig.s.sol";
 import {LinkToken} from "test/mocks/LinkToken.sol";
@@ -41,11 +41,12 @@ contract FundSubscription is Script, CodeConstants {
     }
 
     function fundSubscription(address vrfCoordinator, uint256 subscriptionId, address link) public {
-        console.log("Funding subscriptionId: %s with %s LINK", subscriptionId, FUND_AMOUNT);
+        console2.log("Funding subscriptionId: %s with %s LINK", subscriptionId, FUND_AMOUNT);
         if (block.chainid == LOCAL_CHAIN_ID) {
             vm.startBroadcast();
-            VRFCoordinatorV2_5Mock(vrfCoordinator).fundSubscription(subscriptionId, FUND_AMOUNT);
+            VRFCoordinatorV2_5Mock(vrfCoordinator).fundSubscription(subscriptionId, FUND_AMOUNT * 100);
             vm.stopBroadcast();
+            console2.log("Funded with ",LOCAL_CHAIN_ID);
         } else {
             vm.startBroadcast();
             LinkToken(link).transferAndCall(vrfCoordinator, FUND_AMOUNT, abi.encode(subscriptionId));

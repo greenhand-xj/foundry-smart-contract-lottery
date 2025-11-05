@@ -26,6 +26,7 @@ pragma solidity ^0.8.19;
 import {VRFConsumerBaseV2Plus} from "@chainlink/contracts/src/v0.8/vrf/dev/VRFConsumerBaseV2Plus.sol";
 import {VRFV2PlusClient} from "@chainlink/contracts/src/v0.8/vrf/dev/libraries/VRFV2PlusClient.sol";
 import {AutomationCompatibleInterface} from "@chainlink/contracts/src/v0.8/automation/AutomationCompatible.sol";
+import {console2} from "forge-std/Test.sol";
 
 /**
  * @title A sample Raffle Contract
@@ -65,6 +66,7 @@ contract Raffle is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
     /* Events */
     event RaffleEnter(address indexed player);
     event WinnerPicked(address indexed winner);
+    event RequestedRaffleWinner(uint256 indexed requestId);
 
     /* Functions */
     constructor(
@@ -150,10 +152,12 @@ contract Raffle is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
             requestConfirmations: REQUEST_CONFIRMATIONS,
             callbackGasLimit: i_callbackGasLimit,
             numWords: NUM_WORDS,
-            extraArgs: VRFV2PlusClient._argsToBytes(VRFV2PlusClient.ExtraArgsV1({nativePayment: true})) // new parameter
+            extraArgs: VRFV2PlusClient._argsToBytes(VRFV2PlusClient.ExtraArgsV1({nativePayment: false})) // new parameter
         });
 
         uint256 requestID = s_vrfCoordinator.requestRandomWords(request);
+
+        emit RequestedRaffleWinner(requestID);
     }
 
     /**
@@ -161,6 +165,7 @@ contract Raffle is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
      * calls to send the money to the random winner.
      */
     function fulfillRandomWords(uint256 requestId, uint256[] calldata randomWords) internal override {
+        console2.log("fulfillRandomWords called,randomWords: %s", randomWords[0]);
         uint256 indexOfWinner = randomWords[0] % s_players.length;
         address payable recentWinner = s_players[indexOfWinner];
         s_recentWinner = recentWinner;
@@ -196,5 +201,9 @@ contract Raffle is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
 
     function getRaffleState() public view returns (RaffleState) {
         return s_raffleState;
+    }
+
+    function getRecentWinner() public view returns (address) {
+        return s_recentWinner;
     }
 }
