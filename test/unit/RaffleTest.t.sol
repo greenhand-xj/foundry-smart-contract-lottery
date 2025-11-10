@@ -208,7 +208,7 @@ contract RaffleTest is Test {
         _;
     }
 
-    function testFulfillRandomWordsCanOnlyBeCalledAfterPerformUpkeep(uint256 randomRequestId) public raffleEntered {
+    function testFulfillRandomWordsCanOnlyBeCalledAfterPerformUpkeep(uint256 randomRequestId) public raffleEntered skipFork {
         // Arrange
         // Act / Assert
         vm.expectRevert(VRFCoordinatorV2_5Mock.InvalidRequest.selector);
@@ -220,7 +220,7 @@ contract RaffleTest is Test {
     }
 
 
-     function testFulfillRandomWordsPicksAWinnerResetsAndSendsMoney() public raffleEntered {
+     function testFulfillRandomWordsPicksAWinnerResetsAndSendsMoney() public raffleEntered skipFork {
         address expectedWinner = address(1);
 
         // Arrange
